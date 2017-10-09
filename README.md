@@ -1,2 +1,1 @@
-# dl-mirrors
-Pkgs Downloads Mirrors!
+# Archlinux User Repository
