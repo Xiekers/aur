@@ -1,0 +1,65 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+
+pkgname=sublime-text-dev
+pkgver=3
+_buildver=3156
+pkgrel=1
+pkgdesc="Sophisticated text editor for code, html and prose - dev build"
+arch=('i686' 'x86_64')
+url="http://www.sublimetext.com/3"
+license=('custom')
+depends=('libpng' 'gtk2')
+makedepends=('rsync')
+optdepends=('gksu: sudo-save support')
+conflicts=('sublime-text-nightly','sublime-text')
+
+source_i686=("https://download.sublimetext.com/sublime_text_3_build_${_buildver}_x32.tar.bz2")
+source_x86_64=("https://download.sublimetext.com/sublime_text_3_build_${_buildver}_x64.tar.bz2")
+
+sha256sums_i686=('b1ecc4b70d66b9236b876f1913c4094b6dd51436e45c74883ba70a1939e9f735')
+sha256sums_x86_64=('9ce120c4f28b239d3b3860ee672d9d87e1397a4c08ee6c4e62fd6e261a296519')
+
+package() {
+
+  cd "${srcdir}"
+  install -dm755 "${pkgdir}/opt"
+  install -dm755 "${pkgdir}/usr/bin"
+  install -dm755 "${pkgdir}/usr/share/applications"
+  rsync -rtl "${srcdir}/sublime_text_3/" "${pkgdir}/opt/${pkgname}/"
+
+echo "[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Sublime Text 3 Dev
+GenericName=Text Editor
+Comment=${pkgdesc}
+Exec=subl3 %F
+Terminal=false
+MimeType=text/plain;
+Icon=${pkgname}
+Categories=TextEditor;Development;
+StartupNotify=true
+StartupWMClass=subl3
+Actions=Window;Document;
+
+[Desktop Action Window]
+Name=New Window
+Exec=subl3 -n
+OnlyShowIn=Unity;
+
+[Desktop Action Document]
+Name=New File
+Exec=subl3 --command new_file
+OnlyShowIn=Unity;" > ${srcdir}/$pkgname.desktop
+
+  install -Dm644 "${srcdir}/$pkgname.desktop" "${pkgdir}/usr/share/applications/"
+
+  for res in 128x128 16x16 256x256 32x32 48x48; do
+    install -dm755 "${pkgdir}/usr/share/icons/hicolor/${res}/apps"
+    ln -s "/opt/sublime_text_3/Icon/${res}/sublime-text.png" "${pkgdir}/usr/share/icons/hicolor/${res}/apps/${pkgname}.png"
+  done
+
+  ln -s "/opt/${pkgname}/sublime_text" "${pkgdir}/usr/bin/subl3"
+  ln -s "/opt/${pkgname}/sublime_text" "${pkgdir}/usr/bin/subl"
+  ln -s "/opt/${pkgname}/sublime_text" "${pkgdir}/usr/bin/slt"
+}

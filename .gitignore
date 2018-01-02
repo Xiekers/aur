@@ -1,0 +1,10 @@
+*.tar
+*.tar.gz
+*.tar.xz
+*/*/src
+*/*/pkg
+*/*/pkg
+*.SRCINFO
+/pkg
+build.sh
+

@@ -1,0 +1,45 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+
+pkgname=phpstorm
+pkgver=2017.3.1
+_pkgver=173.3942.32
+pkgrel=1
+pkgdesc='Lightweight and Smart PHP IDE'
+arch=('x86_64' 'i686')
+license=('Commercial')
+url='https://www.jetbrains.com/phpstorm/'
+makedepends=('rsync')
+options=('!strip')
+source=("https://download.jetbrains.com/webide/PhpStorm-${pkgver}.tar.gz")
+sha256sums=('45c7ae9b0f42024592f8fec5669cb7c0e59377304953d3966fb52121772fd12d')
+
+package() {
+
+  install -dm755 "${pkgdir}/opt/"
+  install -dm755 "${pkgdir}/usr/bin/"
+  install -dm755 "${pkgdir}/usr/share/applications/"
+  install -dm755 "${pkgdir}/usr/share/pixmaps/"
+
+echo "[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PhpStorm
+Icon=/opt/${pkgname}/bin/${pkgname}.png
+Exec="/opt/${pkgname}/bin/${pkgname}.sh" %f
+Comment=${pkgdesc}
+Categories=Development;IDE;
+Terminal=false
+StartupNotify=true
+StartupWMClass=${pkgname}" > "${srcdir}/${pkgname}.desktop"
+
+echo "==> sublime-text-dev install/upgrade note:
+  ------------------------------------------------------------------------------
+    To disable in-application reminders about new Sublime Text dev versions,
+    add the following setting to your User Preferences file:
+    "update_check": false"
+
+  rsync -rtl "${srcdir}/PhpStorm-${_pkgver}/" "${pkgdir}/opt/${pkgname}/"
+  ln -s "/opt/${pkgname}/bin/${pkgname}.sh" "${pkgdir}/usr/bin/${pkgname}"
+  install -D -m 644 "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
+  install -D -m 644 "${pkgdir}/opt/${pkgname}/bin/${pkgname}.png" "${pkgdir}/usr/share/pixmaps/${pkgname}.png"
+}

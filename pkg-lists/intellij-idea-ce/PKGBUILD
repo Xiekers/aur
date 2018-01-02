@@ -1,0 +1,48 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+
+pkgname=intellij-idea-ce
+_pkgname=idea-IC
+_buildver=173.3942.27
+pkgver=2017.3.1
+pkgrel=1
+pkgdesc="Intellij Idea IDE (community version) with Intellij JDK"
+arch=('x86_64' 'i686')
+options=(!strip)
+url="http://www.jetbrains.com/idea/"
+license=('Apache2')
+makedepends=('rsync')
+depends=('java-environment' 'giflib' 'libxtst')
+conflicts=('intellij-idea-community-edition')
+source=("https://download.jetbrains.com/idea/ideaIC-${pkgver}.tar.gz")
+sha256sums=('683ad3b8ab347e9ec5e151a268e60ed253b05344293976ab3583d51f75317e86')
+
+package() {
+
+    cd $srcdir/${_pkgname}-${_buildver}
+    install -dm755 "${pkgdir}/usr/bin"
+    install -dm755 "${pkgdir}/opt/${pkgname}"
+    install -dm755 "${pkgdir}/usr/share/licenses"
+    install -dm755 "${pkgdir}/usr/share/pixmaps/"
+    install -dm755 "${pkgdir}/usr/share/applications"
+
+echo "[Desktop Entry]
+Version=$pkgver
+Type=Application
+Name=IntelliJ IDEA Community
+Comment=Intelligent Java IDE
+Exec="/opt/$pkgname/bin/idea.sh" %f
+Icon=/opt/$pkgname/bin/idea.png
+Comment=$pkgdesc
+Categories=Development;IDE;
+Terminal=false
+StartupNotify=true
+StartupWMClass=jetbrains-idea-ce
+" > "${srcdir}/${pkgname}.desktop"
+
+    echo "==> Move Archive File"
+    rsync -rtl ${srcdir}/${_pkgname}-${_buildver}/ ${pkgdir}/opt/${pkgname}/ --exclude=license
+    rsync -rtl ${srcdir}/${_pkgname}-${_buildver}/license/ ${pkgdir}/usr/share/licenses/${pkgname}/
+    install -Dm644 ${srcdir}/${pkgname}.desktop ${pkgdir}/usr/share/applications/
+    ln -s "/opt/${pkgname}/bin/idea.sh" "${pkgdir}/usr/bin/idea"
+    install -D -m 644 "${pkgdir}/opt/${pkgname}/bin/idea.png" "${pkgdir}/usr/share/pixmaps/idea.png"
+}

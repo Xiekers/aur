@@ -1,0 +1,31 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+
+_pkgname=swoole
+pkgname=php-${_pkgname}
+pkgver=2.0.10
+pkgrel=1
+pkgdesc="Event-driven asynchronous and concurrent networking engine with high performance for PHP."
+arch=("i686" "x86_64")
+url="https://github.com/${_pkgname}/${_pkgname}-src"
+license=('Apache')
+depends=('nghttp2')
+makedepends=('php')
+source=("http://pecl.php.net/get/$_pkgname-$pkgver.tgz")
+backup=("etc/php/conf.d/$_pkgname.ini")
+sha256sums=('48588c93a8bff6d99bb9f088e1f454b13c9b0fee3aa4a2757b598e702a2f1793')
+
+build() {
+	echo "==> Start Build Extension"
+	cd "$srcdir/$_pkgname-$pkgver"
+	phpize
+	./configure --enable-http2 --enable-openssl
+	make
+}
+
+package() {
+	cd "$srcdir/$_pkgname-$pkgver"
+	make INSTALL_ROOT="$pkgdir" install
+	echo "extension=$_pkgname.so" > $_pkgname.ini
+	install -Dm644 ${_pkgname}.ini "$pkgdir/etc/php/conf.d/${_pkgname}.ini"
+}
+

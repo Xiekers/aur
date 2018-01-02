@@ -1,0 +1,32 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+_pkgname=uopz
+pkgname=php-${_pkgname}
+pkgver=5.0.2
+pkgrel=2
+pkgdesc='User Operations for Zend'
+arch=('i686' 'x86_64')
+url='https://pecl.php.net/package/uopz'
+license=('PHP')
+depends=('php')
+backup=('etc/php/conf.d/${_pkgname}.ini')
+source=(
+    "$pkgname-$pkgver.tar::https://pecl.php.net/get/${_pkgname}-${pkgver}.tgz"
+)
+sha256sums=('74bfb68c7f88013be6374862eed41b616e0bd6aa522142ccf3394470d487d5c9')
+
+build() {
+    cd "$srcdir/${_pkgname}-$pkgver"
+
+    phpize
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+    cd "$srcdir/${_pkgname}-$pkgver"
+
+    make INSTALL_ROOT="$pkgdir" install
+    echo "extension=${_pkgname}.so" > ${_pkgname}.ini
+    echo "uopz.disable = 0" >> ${_pkgname}.ini
+    install -D -m 644 "${_pkgname}.ini" "$pkgdir/etc/php/conf.d/${_pkgname}.ini"
+}

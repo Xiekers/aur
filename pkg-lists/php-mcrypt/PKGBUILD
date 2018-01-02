@@ -1,0 +1,36 @@
+# Maintainer: Cloudflying <sky@gfw.party>
+_pkgname=mcrypt
+pkgname=php-${_pkgname}
+pkgver=1.0.1
+pkgrel=1
+pkgdesc="Provides bindings for the unmaintained libmcrypt."
+url="https://pecl.php.net/package/${_pkgname}"
+arch=('x86_64' 'i686' 'armv7h' 'aarch64')
+license=('PHP')
+depends=(
+    'php>=7.0.0'
+)
+backup=('etc/php/conf.d/${_pkgname}.ini')
+
+source=(
+    "$pkgname-$pkgver.tar.gz::http://pecl.php.net/get/${_pkgname}-${pkgver}.tgz"
+)
+
+sha256sums=('a3b0e5493b5cd209ab780ee54733667293d369e6b7052b4a7dab9dd0def46ac6')
+
+build() {
+  echo "==> Start Build Extension"
+  cd "$srcdir/${_pkgname}-$pkgver"
+
+  phpize
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$srcdir/${_pkgname}-$pkgver"
+  make INSTALL_ROOT="$pkgdir" install
+  echo "extension=${_pkgname}.so" > ${_pkgname}.ini
+  install -Dm644 ${_pkgname}.ini "$pkgdir/etc/php/conf.d/${_pkgname}.ini"
+  install -m0755 -D ".libs/$_pkgname.so" "$pkgdir$(php-config --extension-dir)/$_pkgname.so"
+}
